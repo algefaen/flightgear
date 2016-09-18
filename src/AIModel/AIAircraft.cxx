@@ -201,6 +201,9 @@ void FGAIAircraft::AccelTo(double speed) {
     //assertSpeed(speed);
     if (!isStationary())
         _needsGroundElevation = true;
+
+    SG_LOG(SG_AI, SG_BULK, "AccelTo: " << trafficRef->getCallSign() 
+             << ": speed " << tgt_speed << " (current " << speed << ")");
 }
 
 
@@ -252,6 +255,8 @@ void FGAIAircraft::setFlightPlan(const std::string& flightplan, bool repeat)
     if (fp->isValidPlan()) {
         fp->setRepeat(repeat);
         SetFlightPlan(fp);
+    SG_LOG(SG_AI, SG_BULK, "setFlightPlan: " << trafficRef->getCallSign() 
+             << ": speed " << speed << " (" << tgt_speed << ")");
     } else {
         SG_LOG(SG_AI, SG_WARN, "setFlightPlan: invalid flightplan specified:" << flightplan);
         delete fp;
@@ -1007,6 +1012,9 @@ void FGAIAircraft::updatePrimaryTargetValues(double dt, bool& flightplanActive, 
         //cerr << "UpateTArgetValues() " << endl;
         ProcessFlightPlan(dt, now);
 
+        SG_LOG(SG_AI, SG_BULK, "updatePrimaryTargetValues2: " << trafficRef->getCallSign() 
+                 << ": speed " << speed << " (" << tgt_speed << ") "
+                 << ": hdg " << hdg << " (" << tgt_heading << ")");
         // Do execute Ground elev for inactive aircraft, so they
         // Are repositioned to the correct ground altitude when the user flies within visibility range.
         // In addition, check whether we are out of user range, so this aircraft
@@ -1302,6 +1310,10 @@ void FGAIAircraft::updateActualState(double dt)
 
     vs = _performance->actualVerticalSpeed(this, tgt_vs, dt);
     pitch = _performance->actualPitch(this, tgt_pitch, dt);
+
+    SG_LOG(SG_AI, SG_BULK, "updateActualState: " << trafficRef->getCallSign() 
+             << ": speed " << speed << " (" << tgt_speed << ") "
+             << ": hdg " << hdg << " (" << tgt_heading << ")");
 }
 
 void FGAIAircraft::updateSecondaryTargetValues(double dt) {
