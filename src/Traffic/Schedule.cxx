@@ -269,10 +269,17 @@ bool FGAISchedule::update(time_t now, const SGVec3d& userCart)
   if (!dep || !arr) {
     return true; // processing complete
   }
+
     
   double speed = 450.0;
   if (dep != arr) {
     totalTimeEnroute = flight->getArrivalTime() - flight->getDepartureTime();
+    int time_to_departure = flight->getDepartureTime() - now;
+    if ( time_to_departure > 60*60*24 ) {
+      SG_LOG(SG_AI, SG_BULK, "Traffic Manager: Not spawning " << registration << " from "
+                 << dep->getId() << " to " << arr->getId() << " because it is more than a day from now");
+      return true;
+    }
     if (flight->getDepartureTime() < now) {
       elapsedTimeEnroute   = now - flight->getDepartureTime();
       //remainingTimeEnroute = totalTimeEnroute - elapsedTimeEnroute;
@@ -295,7 +302,7 @@ bool FGAISchedule::update(time_t now, const SGVec3d& userCart)
       elapsedTimeEnroute = 0;
       position = dep->geod();
       SG_LOG (SG_AI, SG_BULK, "Traffic Manager:      Flight is pending, departure in "
-        << flight->getDepartureTime() - now << " seconds ");
+        << time_to_departure << " seconds ");
     }
   } else {
     // departure / arrival coincident
