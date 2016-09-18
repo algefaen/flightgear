@@ -126,10 +126,14 @@ bool FGAIFlightPlan::createPushBack(FGAIAircraft *ac,
             pushBackWaypoint(wpt);
             //previous = node;
         }
+        // set first waypoint's name to "gate" so that we can identify later
+        waypoints.front()->setName(string("gate"));
         // some special considerations for the last point:
         waypoints.back()->setName(string("PushBackPoint"));
         waypoints.back()->setSpeed(vTaxi);
-        ac->setTaxiClearanceRequest(true);
+
+        // FIXME taxiClearance seems to be broken, it is set to false everywhere else as well
+        ac->setTaxiClearanceRequest(false);
     } else {  // In case of a push forward departure...
         ac->setTaxiClearanceRequest(false);
         double az2 = 0.0;
@@ -158,8 +162,8 @@ bool FGAIFlightPlan::createPushBack(FGAIAircraft *ac,
           pushBackWaypoint(wpt);
       }
 
+      waypoints.front()->setName(string("gate"));
       waypoints.back()->setName(string("PushBackPoint"));
-      // cerr << "Done assinging new name" << endl;
     }
 
     return true;

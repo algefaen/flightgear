@@ -747,13 +747,22 @@ void FGAIAircraft::handleFirstWaypoint() {
 
     setLatitude(prev->getLatitude());
     setLongitude(prev->getLongitude());
-    setSpeed(prev->getSpeed());
     setAltitude(prev->getAltitude());
 
-    if (prev->getSpeed() > 0.0)
-        setHeading(fp->getBearing(prev, curr));
+    // Use the parking position's heading if we're at the gate
+    if(prev->contains("gate"))
+    {
+        setHeading(fp->getParkingGate()->getHeading());
+    }
     else
-        setHeading(fp->getBearing(curr, prev));
+    {
+        setSpeed(prev->getSpeed());
+
+        if (prev->getSpeed() > 0.0)
+            setHeading(fp->getBearing(prev, curr));
+        else
+            setHeading(fp->getBearing(curr, prev));
+    }
 
     // If next doesn't exist, as in incrementally created flightplans for
     // AI/Trafficmanager created plans,
@@ -819,8 +828,8 @@ bool FGAIAircraft::leadPointReached(FGAIWaypoint* curr) {
     // experimental: Use fabs, because speed can be negative (I hope) during push_back.
     if ((dist_to_go < fabs(10.0* speed)) && (speed < 0) && (tgt_speed < 0) && fp->getCurrentWaypoint()->contains("PushBackPoint")) {
           tgt_speed = -(dist_to_go / 10.0);
-          if (tgt_speed > -0.5) {
-                tgt_speed = -0.5;
+          if (tgt_speed > -3.0) {
+                tgt_speed = -3.0;
           }
           //assertSpeed(tgt_speed);
           if (fp->getPreviousWaypoint()->getSpeed() < tgt_speed) {
